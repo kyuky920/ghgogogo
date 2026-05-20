@@ -14,11 +14,13 @@ interface Props {
     with_friend?: boolean
     with_guardian?: boolean
     registration_kind?: 'onsite' | 'preregister'
+    registration_source?: 'online' | 'manual'
   }
   isAdmin?: boolean
   onAdminSave?: () => void
   onCancel?: () => void
   registrationKind?: 'onsite' | 'preregister'
+  registrationSource?: 'online' | 'manual'
   eventLabel?: string
 }
 
@@ -29,6 +31,7 @@ export default function RegisterForm({
   onAdminSave,
   onCancel,
   registrationKind = 'onsite',
+  registrationSource = 'online',
   eventLabel = '어린이 잔치',
 }: Props) {
   const presetSchools = ['숲내초등학교', '향동초등학교']
@@ -60,6 +63,7 @@ export default function RegisterForm({
   const [error, setError] = useState('')
   const isEditing = Boolean(isAdmin && initialData?.id)
   const effectiveRegistrationKind = initialData?.registration_kind || registrationKind
+  const effectiveRegistrationSource = initialData?.registration_source || registrationSource
 
   const handleSubmit = async () => {
     if (!visitorName.trim()) {
@@ -100,6 +104,7 @@ export default function RegisterForm({
         with_friend: withFriend,
         with_guardian: withGuardian,
         registration_kind: effectiveRegistrationKind,
+        registration_source: effectiveRegistrationSource,
       }
       const { error: dbError } = isEditing
         ? await supabase.from('registrations').update(payload).eq('id', initialData?.id)

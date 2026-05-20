@@ -60,10 +60,11 @@ export default function AdminPage() {
   }
 
   const handleExportCSV = () => {
-    const headers = ['이름', '사전등록', '현장참석', '소개자', '학교', '방문 계기', '학년(세)', '친구동반', '보호자동반', '등록시각', '체크시각']
+    const headers = ['이름', '등록구분', '등록경로', '현장참석', '소개자', '학교', '방문 계기', '학년(세)', '친구동반', '보호자동반', '등록시각', '체크시각']
     const rows = registrations.map(r => [
       r.visitor_name,
       r.registration_kind === 'preregister' ? '사전등록' : '현장등록',
+      r.registration_source === 'manual' ? '수동등록' : '온라인등록',
       r.checked_in ? '체크완료' : '',
       r.introducer_name || '',
       r.school || '',
@@ -94,6 +95,8 @@ export default function AdminPage() {
   const totalFriend = registrations.filter(r => r.with_friend).length
   const totalGuardian = registrations.filter(r => r.with_guardian).length
   const totalPreregistered = registrations.filter(r => r.registration_kind === 'preregister').length
+  const totalOnsite = registrations.filter(r => r.registration_kind === 'onsite').length
+  const totalManual = registrations.filter(r => r.registration_source === 'manual').length
   const totalCheckedIn = registrations.filter(r => r.checked_in).length
 
   // ─── Login Screen ───
@@ -172,6 +175,8 @@ export default function AdminPage() {
           {[
             { label: '총 등록자', value: registrations.length, color: '#FF6EB4', emoji: '👥' },
             { label: '사전등록자', value: totalPreregistered, color: '#FFB300', emoji: '📝' },
+            { label: '현장등록자', value: totalOnsite, color: '#FF8C42', emoji: '🏃' },
+            { label: '수동등록', value: totalManual, color: '#8E24AA', emoji: '✍️' },
             { label: '현장 체크완료', value: totalCheckedIn, color: '#26A69A', emoji: '✅' },
             { label: '친구와 함께', value: totalFriend, color: '#4FC3F7', emoji: '👫' },
             { label: '보호자와 함께', value: totalGuardian, color: '#69D46B', emoji: '👨‍👩‍👧' },
@@ -191,6 +196,7 @@ export default function AdminPage() {
               isAdmin
               initialData={editingRegistration || undefined}
               registrationKind="onsite"
+              registrationSource="manual"
               onSuccess={() => {}}
               onAdminSave={() => {
                 closeEditor()
@@ -226,7 +232,7 @@ export default function AdminPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: '#F9F9F9' }}>
-                    {['#', '방문자', '구분', '현장참석', '소개자', '학교', '방문 계기', '학년', '친구', '보호자', '등록시각', ''].map(h => (
+                    {['#', '방문자', '등록구분', '등록경로', '현장참석', '소개자', '학교', '방문 계기', '학년', '친구', '보호자', '등록시각', ''].map(h => (
                       <th key={h} style={{ padding: '12px 14px', textAlign: 'left', color: '#666', fontWeight: '700', whiteSpace: 'nowrap', borderBottom: '1px solid #F0F0F0' }}>{h}</th>
                     ))}
                   </tr>
@@ -238,6 +244,9 @@ export default function AdminPage() {
                       <td style={{ padding: '12px 14px', fontWeight: '700', color: '#333' }}>{r.visitor_name}</td>
                       <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
                         {r.registration_kind === 'preregister' ? '사전등록' : '현장등록'}
+                      </td>
+                      <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
+                        {r.registration_source === 'manual' ? '수동등록' : '온라인등록'}
                       </td>
                       <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
                         {r.registration_kind === 'preregister' ? (

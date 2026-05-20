@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS registrations (
   with_friend     BOOLEAN     NOT NULL DEFAULT false,
   with_guardian   BOOLEAN     NOT NULL DEFAULT false,
   registration_kind TEXT      NOT NULL DEFAULT 'onsite',
+  registration_source TEXT    NOT NULL DEFAULT 'online',
   checked_in       BOOLEAN     NOT NULL DEFAULT false,
   checked_in_at    TIMESTAMPTZ,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -24,6 +25,9 @@ ALTER TABLE registrations
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS registration_kind TEXT NOT NULL DEFAULT 'onsite';
+
+ALTER TABLE registrations
+  ADD COLUMN IF NOT EXISTS registration_source TEXT NOT NULL DEFAULT 'online';
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS checked_in BOOLEAN NOT NULL DEFAULT false;

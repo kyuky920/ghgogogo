@@ -18,6 +18,7 @@ export type Registration = {
   with_friend: boolean
   with_guardian: boolean
   registration_kind: 'onsite' | 'preregister'
+  registration_source: 'online' | 'manual'
   checked_in: boolean
   checked_in_at: string | null
   created_at: string
