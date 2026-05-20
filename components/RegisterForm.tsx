@@ -13,13 +13,24 @@ interface Props {
     grade?: number | null
     with_friend?: boolean
     with_guardian?: boolean
+    registration_kind?: 'onsite' | 'preregister'
   }
   isAdmin?: boolean
   onAdminSave?: () => void
   onCancel?: () => void
+  registrationKind?: 'onsite' | 'preregister'
+  eventLabel?: string
 }
 
-export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminSave, onCancel }: Props) {
+export default function RegisterForm({
+  onSuccess,
+  initialData,
+  isAdmin,
+  onAdminSave,
+  onCancel,
+  registrationKind = 'onsite',
+  eventLabel = '어린이 잔치',
+}: Props) {
   const presetSchools = ['숲내초등학교', '향동초등학교']
   const presetVisitPaths = [
     '광흥교회에 다니고 있어요.',
@@ -48,6 +59,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const isEditing = Boolean(isAdmin && initialData?.id)
+  const effectiveRegistrationKind = initialData?.registration_kind || registrationKind
 
   const handleSubmit = async () => {
     if (!visitorName.trim()) {
@@ -87,6 +99,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
         grade: grade ? parseInt(grade) : null,
         with_friend: withFriend,
         with_guardian: withGuardian,
+        registration_kind: effectiveRegistrationKind,
       }
       const { error: dbError } = isEditing
         ? await supabase.from('registrations').update(payload).eq('id', initialData?.id)
@@ -121,7 +134,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
             letterSpacing: '-0.02em',
             lineHeight: 1.1,
           }}>
-            어린이 잔치
+            {eventLabel}
           </div>
           <div style={{
             display: 'flex',

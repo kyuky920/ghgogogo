@@ -13,11 +13,23 @@ CREATE TABLE IF NOT EXISTS registrations (
   grade           INTEGER,
   with_friend     BOOLEAN     NOT NULL DEFAULT false,
   with_guardian   BOOLEAN     NOT NULL DEFAULT false,
+  registration_kind TEXT      NOT NULL DEFAULT 'onsite',
+  checked_in       BOOLEAN     NOT NULL DEFAULT false,
+  checked_in_at    TIMESTAMPTZ,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS visit_path TEXT;
+
+ALTER TABLE registrations
+  ADD COLUMN IF NOT EXISTS registration_kind TEXT NOT NULL DEFAULT 'onsite';
+
+ALTER TABLE registrations
+  ADD COLUMN IF NOT EXISTS checked_in BOOLEAN NOT NULL DEFAULT false;
+
+ALTER TABLE registrations
+  ADD COLUMN IF NOT EXISTS checked_in_at TIMESTAMPTZ;
 
 -- 2. RLS (Row Level Security) 활성화
 ALTER TABLE registrations ENABLE ROW LEVEL SECURITY;
@@ -40,6 +52,13 @@ CREATE POLICY "Anyone can delete"
   TO anon
   USING (true);
 
--- 6. 인덱스 (성능 최적화)
+-- 6. anon 키로 UPDATE 가능 (Admin에서 수정 / 체크인)
+CREATE POLICY "Anyone can update"
+  ON registrations FOR UPDATE
+  TO anon
+  USING (true)
+  WITH CHECK (true);
+
+-- 7. 인덱스 (성능 최적화)
 CREATE INDEX IF NOT EXISTS idx_registrations_created_at
   ON registrations(created_at DESC);

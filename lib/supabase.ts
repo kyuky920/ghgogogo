@@ -17,5 +17,8 @@ export type Registration = {
   grade: number | null
   with_friend: boolean
   with_guardian: boolean
+  registration_kind: 'onsite' | 'preregister'
+  checked_in: boolean
+  checked_in_at: string | null
   created_at: string
 }

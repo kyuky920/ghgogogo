@@ -2,9 +2,15 @@
 
 interface Props {
   onRegisterCompanion: () => void
+  title?: string
+  buttonLabel?: string
 }
 
-export default function AlreadyRegistered({ onRegisterCompanion }: Props) {
+export default function AlreadyRegistered({
+  onRegisterCompanion,
+  title = '이미 등록되었어요! 😊',
+  buttonLabel = '👬 같이온 친구 등록하기',
+}: Props) {
   return (
     <div style={{
       minHeight: '100vh',
@@ -28,7 +34,7 @@ export default function AlreadyRegistered({ onRegisterCompanion }: Props) {
             marginBottom: '8px',
             lineHeight: 1.2,
           }}>
-            이미 등록되었어요! 😊
+            {title}
           </div>
 
           <div style={{
@@ -102,7 +108,7 @@ export default function AlreadyRegistered({ onRegisterCompanion }: Props) {
             onClick={onRegisterCompanion}
             style={{ width: '100%' }}
           >
-            👬 같이온 친구 등록하기
+            {buttonLabel}
           </button>
         </div>
 

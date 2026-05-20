@@ -42,15 +42,29 @@ export default function AdminPage() {
     fetchData()
   }
 
+  const handleToggleCheckIn = async (registration: Registration) => {
+    const nextCheckedIn = !registration.checked_in
+    await supabase
+      .from('registrations')
+      .update({
+        checked_in: nextCheckedIn,
+        checked_in_at: nextCheckedIn ? new Date().toISOString() : null,
+      })
+      .eq('id', registration.id)
+    fetchData()
+  }
+
   const closeEditor = () => {
     setShowAddForm(false)
     setEditingRegistration(null)
   }
 
   const handleExportCSV = () => {
-    const headers = ['이름', '소개자', '학교', '방문 계기', '학년(세)', '친구동반', '보호자동반', '등록시각']
+    const headers = ['이름', '사전등록', '현장참석', '소개자', '학교', '방문 계기', '학년(세)', '친구동반', '보호자동반', '등록시각', '체크시각']
     const rows = registrations.map(r => [
       r.visitor_name,
+      r.registration_kind === 'preregister' ? '사전등록' : '현장등록',
+      r.checked_in ? '체크완료' : '',
       r.introducer_name || '',
       r.school || '',
       r.visit_path || '',
@@ -58,6 +72,7 @@ export default function AdminPage() {
       r.with_friend ? '✓' : '',
       r.with_guardian ? '✓' : '',
       new Date(r.created_at).toLocaleString('ko-KR'),
+      r.checked_in_at ? new Date(r.checked_in_at).toLocaleString('ko-KR') : '',
     ])
     const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' })
@@ -78,6 +93,8 @@ export default function AdminPage() {
 
   const totalFriend = registrations.filter(r => r.with_friend).length
   const totalGuardian = registrations.filter(r => r.with_guardian).length
+  const totalPreregistered = registrations.filter(r => r.registration_kind === 'preregister').length
+  const totalCheckedIn = registrations.filter(r => r.checked_in).length
 
   // ─── Login Screen ───
   if (!authed) {
@@ -151,9 +168,11 @@ export default function AdminPage() {
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '20px' }}>
           {[
             { label: '총 등록자', value: registrations.length, color: '#FF6EB4', emoji: '👥' },
+            { label: '사전등록자', value: totalPreregistered, color: '#FFB300', emoji: '📝' },
+            { label: '현장 체크완료', value: totalCheckedIn, color: '#26A69A', emoji: '✅' },
             { label: '친구와 함께', value: totalFriend, color: '#4FC3F7', emoji: '👫' },
             { label: '보호자와 함께', value: totalGuardian, color: '#69D46B', emoji: '👨‍👩‍👧' },
           ].map((stat) => (
@@ -171,6 +190,7 @@ export default function AdminPage() {
             <RegisterForm
               isAdmin
               initialData={editingRegistration || undefined}
+              registrationKind="onsite"
               onSuccess={() => {}}
               onAdminSave={() => {
                 closeEditor()
@@ -206,7 +226,7 @@ export default function AdminPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: '#F9F9F9' }}>
-                    {['#', '방문자', '소개자', '학교', '방문 계기', '학년', '친구', '보호자', '등록시각', ''].map(h => (
+                    {['#', '방문자', '구분', '현장참석', '소개자', '학교', '방문 계기', '학년', '친구', '보호자', '등록시각', ''].map(h => (
                       <th key={h} style={{ padding: '12px 14px', textAlign: 'left', color: '#666', fontWeight: '700', whiteSpace: 'nowrap', borderBottom: '1px solid #F0F0F0' }}>{h}</th>
                     ))}
                   </tr>
@@ -216,6 +236,30 @@ export default function AdminPage() {
                     <tr key={r.id} style={{ borderBottom: '1px solid #F5F5F5' }}>
                       <td style={{ padding: '12px 14px', color: '#aaa', fontSize: '12px' }}>{filtered.length - i}</td>
                       <td style={{ padding: '12px 14px', fontWeight: '700', color: '#333' }}>{r.visitor_name}</td>
+                      <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
+                        {r.registration_kind === 'preregister' ? '사전등록' : '현장등록'}
+                      </td>
+                      <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
+                        {r.registration_kind === 'preregister' ? (
+                          <button
+                            onClick={() => handleToggleCheckIn(r)}
+                            style={{
+                              border: 'none',
+                              borderRadius: '999px',
+                              background: r.checked_in ? '#E0F2F1' : '#FFF3E0',
+                              color: r.checked_in ? '#00796B' : '#EF6C00',
+                              fontWeight: '700',
+                              fontSize: '12px',
+                              padding: '7px 12px',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {r.checked_in ? '체크완료' : '도착 체크'}
+                          </button>
+                        ) : (
+                          <span style={{ color: '#AAA' }}>-</span>
+                        )}
+                      </td>
                       <td style={{ padding: '12px 14px', color: '#666' }}>{r.introducer_name || '-'}</td>
                       <td style={{ padding: '12px 14px', color: '#666' }}>{r.school || '-'}</td>
                       <td style={{ padding: '12px 14px', color: '#666', minWidth: '220px' }}>{r.visit_path || '-'}</td>
