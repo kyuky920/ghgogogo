@@ -54,7 +54,7 @@ body {
 }
 .input-field:focus { border-color: var(--pink); background: white; }
 
-.checkbox-card {
+.choice-card {
   border: 2px solid #E8E8E8;
   border-radius: 16px;
   padding: 14px 20px;
@@ -65,5 +65,6 @@ body {
   gap: 10px;
   background: #FAFAFA;
 }
-.checkbox-card.checked { border-color: var(--purple); background: #F5EEFF; }
-.checkbox-card input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--purple); }
+.choice-card.checked { border-color: var(--purple); background: #F5EEFF; }
+.choice-card input[type="checkbox"],
+.choice-card input[type="radio"] { width: 20px; height: 20px; accent-color: var(--purple); }

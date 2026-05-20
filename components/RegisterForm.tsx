@@ -5,9 +5,10 @@ import { supabase } from '@/lib/supabase'
 interface Props {
   onSuccess: () => void
   initialData?: {
+    id?: string
     visitor_name?: string
-    introducer_name?: string
-    school?: string
+    introducer_name?: string | null
+    school?: string | null
     visit_path?: string | null
     grade?: number | null
     with_friend?: boolean
@@ -15,9 +16,10 @@ interface Props {
   }
   isAdmin?: boolean
   onAdminSave?: () => void
+  onCancel?: () => void
 }
 
-export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminSave }: Props) {
+export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminSave, onCancel }: Props) {
   const presetSchools = ['숲내초등학교', '향동초등학교']
   const presetVisitPaths = [
     '광흥교회에 다니고 있어요.',
@@ -45,6 +47,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
   const [withGuardian, setWithGuardian] = useState(initialData?.with_guardian || false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const isEditing = Boolean(isAdmin && initialData?.id)
 
   const handleSubmit = async () => {
     if (!visitorName.trim()) {
@@ -76,7 +79,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
     setError('')
     setLoading(true)
     try {
-      const { error: dbError } = await supabase.from('registrations').insert({
+      const payload = {
         visitor_name: visitorName.trim(),
         introducer_name: introducerName.trim() || null,
         school: schoolValue || null,
@@ -84,7 +87,10 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
         grade: grade ? parseInt(grade) : null,
         with_friend: withFriend,
         with_guardian: withGuardian,
-      })
+      }
+      const { error: dbError } = isEditing
+        ? await supabase.from('registrations').update(payload).eq('id', initialData?.id)
+        : await supabase.from('registrations').insert(payload)
       if (dbError) throw dbError
       if (isAdmin && onAdminSave) {
         onAdminSave()
@@ -155,7 +161,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
       <div className="card" style={{ marginBottom: '16px' }}>
         {isAdmin && (
           <div style={{ fontWeight: '700', fontSize: '1.1rem', marginBottom: '20px', color: '#333' }}>
-            ✏️ 수동 등록
+            {isEditing ? '🛠️ 등록 정보 수정' : '✏️ 수동 등록'}
           </div>
         )}
 
@@ -194,16 +200,35 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
               <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
                 🏫 학교 <span style={{ color: '#aaa', fontWeight: '400' }}>(선택)</span>
               </label>
-              <select
-                className="input-field"
-                value={schoolOption}
-                onChange={e => setSchoolOption(e.target.value)}
-              >
-                <option value="">선택 안함</option>
-                <option value="숲내초등학교">숲내초등학교</option>
-                <option value="향동초등학교">향동초등학교</option>
-                <option value="other">기타 학교 (직접 입력)</option>
-              </select>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label className={`choice-card ${schoolOption === '숲내초등학교' ? 'checked' : ''}`}>
+                  <input
+                    type="radio"
+                    name="school-option"
+                    checked={schoolOption === '숲내초등학교'}
+                    onChange={() => setSchoolOption('숲내초등학교')}
+                  />
+                  <span style={{ fontWeight: '600', fontSize: '15px' }}>숲내초등학교</span>
+                </label>
+                <label className={`choice-card ${schoolOption === '향동초등학교' ? 'checked' : ''}`}>
+                  <input
+                    type="radio"
+                    name="school-option"
+                    checked={schoolOption === '향동초등학교'}
+                    onChange={() => setSchoolOption('향동초등학교')}
+                  />
+                  <span style={{ fontWeight: '600', fontSize: '15px' }}>향동초등학교</span>
+                </label>
+                <label className={`choice-card ${schoolOption === 'other' ? 'checked' : ''}`}>
+                  <input
+                    type="radio"
+                    name="school-option"
+                    checked={schoolOption === 'other'}
+                    onChange={() => setSchoolOption('other')}
+                  />
+                  <span style={{ fontWeight: '600', fontSize: '15px' }}>기타 학교 직접 입력</span>
+                </label>
+              </div>
               {schoolOption === 'other' && (
                 <input
                   className="input-field"
@@ -235,18 +260,53 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
               🚪 방문 계기(경로) <span style={{ color: '#E91E8C' }}>*</span>
             </label>
-            <select
-              className="input-field"
-              value={visitPathOption}
-              onChange={e => setVisitPathOption(e.target.value)}
-            >
-              <option value="">선택해주세요</option>
-              <option value="광흥교회에 다니고 있어요.">광흥교회에 다니고 있어요.</option>
-              <option value="광흥교회의 친구를 따라 왔어요.">광흥교회의 친구를 따라 왔어요.</option>
-              <option value="홍보 현수막을 보고 왔어요.">홍보 현수막을 보고 왔어요.</option>
-              <option value="홍보 책자를 받고 왔어요.">홍보 책자를 받고 왔어요.</option>
-              <option value="other">기타</option>
-            </select>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label className={`choice-card ${visitPathOption === '광흥교회에 다니고 있어요.' ? 'checked' : ''}`}>
+                <input
+                  type="radio"
+                  name="visit-path-option"
+                  checked={visitPathOption === '광흥교회에 다니고 있어요.'}
+                  onChange={() => setVisitPathOption('광흥교회에 다니고 있어요.')}
+                />
+                <span style={{ fontWeight: '600', fontSize: '15px' }}>광흥교회에 다니고 있어요.</span>
+              </label>
+              <label className={`choice-card ${visitPathOption === '광흥교회의 친구를 따라 왔어요.' ? 'checked' : ''}`}>
+                <input
+                  type="radio"
+                  name="visit-path-option"
+                  checked={visitPathOption === '광흥교회의 친구를 따라 왔어요.'}
+                  onChange={() => setVisitPathOption('광흥교회의 친구를 따라 왔어요.')}
+                />
+                <span style={{ fontWeight: '600', fontSize: '15px' }}>광흥교회의 친구를 따라 왔어요.</span>
+              </label>
+              <label className={`choice-card ${visitPathOption === '홍보 현수막을 보고 왔어요.' ? 'checked' : ''}`}>
+                <input
+                  type="radio"
+                  name="visit-path-option"
+                  checked={visitPathOption === '홍보 현수막을 보고 왔어요.'}
+                  onChange={() => setVisitPathOption('홍보 현수막을 보고 왔어요.')}
+                />
+                <span style={{ fontWeight: '600', fontSize: '15px' }}>홍보 현수막을 보고 왔어요.</span>
+              </label>
+              <label className={`choice-card ${visitPathOption === '홍보 책자를 받고 왔어요.' ? 'checked' : ''}`}>
+                <input
+                  type="radio"
+                  name="visit-path-option"
+                  checked={visitPathOption === '홍보 책자를 받고 왔어요.'}
+                  onChange={() => setVisitPathOption('홍보 책자를 받고 왔어요.')}
+                />
+                <span style={{ fontWeight: '600', fontSize: '15px' }}>홍보 책자를 받고 왔어요.</span>
+              </label>
+              <label className={`choice-card ${visitPathOption === 'other' ? 'checked' : ''}`}>
+                <input
+                  type="radio"
+                  name="visit-path-option"
+                  checked={visitPathOption === 'other'}
+                  onChange={() => setVisitPathOption('other')}
+                />
+                <span style={{ fontWeight: '600', fontSize: '15px' }}>기타</span>
+              </label>
+            </div>
             {visitPathOption === 'other' && (
               <input
                 className="input-field"
@@ -265,7 +325,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
               🎈 참석 유형 <span style={{ color: '#E91E8C' }}>*</span>
             </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label className={`checkbox-card ${withFriend ? 'checked' : ''}`}>
+              <label className={`choice-card ${withFriend ? 'checked' : ''}`}>
                 <input
                   type="checkbox"
                   checked={withFriend}
@@ -273,7 +333,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
                 />
                 <span style={{ fontWeight: '600', fontSize: '15px' }}>👫 친구와 함께 참석</span>
               </label>
-              <label className={`checkbox-card ${withGuardian ? 'checked' : ''}`}>
+              <label className={`choice-card ${withGuardian ? 'checked' : ''}`}>
                 <input
                   type="checkbox"
                   checked={withGuardian}
@@ -300,14 +360,36 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
           </div>
         )}
 
-        <button
-          className="bubble-btn"
-          style={{ marginTop: '24px' }}
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading ? '등록 중...' : isAdmin ? '💾 저장하기' : '🎉 등록 완료!'}
-        </button>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
+          {isAdmin && onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={loading}
+              style={{
+                flex: 1,
+                border: '2px solid #DDD',
+                background: 'white',
+                color: '#666',
+                borderRadius: '50px',
+                padding: '14px 20px',
+                fontSize: '1rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+              }}
+            >
+              목록으로
+            </button>
+          )}
+          <button
+            className="bubble-btn"
+            style={{ marginTop: 0, flex: 1 }}
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? (isEditing ? '저장 중...' : '등록 중...') : isEditing ? '💾 수정 저장' : isAdmin ? '💾 저장하기' : '🎉 등록 완료!'}
+          </button>
+        </div>
       </div>
 
       {!isAdmin && (

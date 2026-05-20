@@ -10,6 +10,7 @@ export default function AdminPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [loading, setLoading] = useState(false)
   const [showAddForm, setShowAddForm] = useState(false)
+  const [editingRegistration, setEditingRegistration] = useState<Registration | null>(null)
   const [search, setSearch] = useState('')
 
   const fetchData = useCallback(async () => {
@@ -39,6 +40,11 @@ export default function AdminPage() {
     if (!confirm('이 등록을 삭제할까요?')) return
     await supabase.from('registrations').delete().eq('id', id)
     fetchData()
+  }
+
+  const closeEditor = () => {
+    setShowAddForm(false)
+    setEditingRegistration(null)
   }
 
   const handleExportCSV = () => {
@@ -129,10 +135,17 @@ export default function AdminPage() {
               📥 CSV 내보내기
             </button>
             <button
-              onClick={() => setShowAddForm(!showAddForm)}
+              onClick={() => {
+                if (showAddForm) {
+                  closeEditor()
+                  return
+                }
+                setEditingRegistration(null)
+                setShowAddForm(true)
+              }}
               style={{ padding: '8px 16px', borderRadius: '20px', border: 'none', background: 'linear-gradient(135deg, #FF6EB4, #FF8C42)', color: 'white', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
             >
-              ➕ 수동 등록
+              {showAddForm ? '✖ 닫기' : '➕ 수동 등록'}
             </button>
           </div>
         </div>
@@ -153,15 +166,17 @@ export default function AdminPage() {
         </div>
 
         {/* Manual Add Form */}
-        {showAddForm && (
+        {(showAddForm || editingRegistration) && (
           <div style={{ marginBottom: '20px' }}>
             <RegisterForm
               isAdmin
+              initialData={editingRegistration || undefined}
               onSuccess={() => {}}
               onAdminSave={() => {
-                setShowAddForm(false)
+                closeEditor()
                 fetchData()
               }}
+              onCancel={closeEditor}
             />
           </div>
         )}
@@ -214,7 +229,17 @@ export default function AdminPage() {
                       <td style={{ padding: '12px 14px', color: '#999', fontSize: '12px', whiteSpace: 'nowrap' }}>
                         {new Date(r.created_at).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
-                      <td style={{ padding: '12px 14px' }}>
+                      <td style={{ padding: '12px 14px', whiteSpace: 'nowrap' }}>
+                        <button
+                          onClick={() => {
+                            setShowAddForm(false)
+                            setEditingRegistration(r)
+                          }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#FF8C42', fontSize: '16px', padding: '4px', marginRight: '8px' }}
+                          title="수정"
+                        >
+                          ✏️
+                        </button>
                         <button
                           onClick={() => handleDelete(r.id)}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF5350', fontSize: '16px', padding: '4px' }}
