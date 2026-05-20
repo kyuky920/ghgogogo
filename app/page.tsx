@@ -22,7 +22,14 @@ export default function Home() {
   }
 
   if (alreadyDone) {
-    return <AlreadyRegistered />
+    return (
+      <AlreadyRegistered
+        onRegisterCompanion={() => {
+          localStorage.setItem(STORAGE_KEY, 'false')
+          setAlreadyDone(false)
+        }}
+      />
+    )
   }
 
   return (

@@ -1,6 +1,10 @@
 'use client'
 
-export default function AlreadyRegistered() {
+interface Props {
+  onRegisterCompanion: () => void
+}
+
+export default function AlreadyRegistered({ onRegisterCompanion }: Props) {
   return (
     <div style={{
       minHeight: '100vh',
@@ -80,6 +84,7 @@ export default function AlreadyRegistered() {
             border: '2px solid #CE93D8',
             borderRadius: '16px',
             padding: '14px',
+            marginBottom: '18px',
           }}>
             <div style={{ fontWeight: '700', color: '#6A1B9A', marginBottom: '4px', fontSize: '14px' }}>
               📞 문의
@@ -91,6 +96,14 @@ export default function AlreadyRegistered() {
               문자로 &quot;고고고&quot;라고 보내주시면 안내해 드려요
             </div>
           </div>
+
+          <button
+            className="bubble-btn"
+            onClick={onRegisterCompanion}
+            style={{ width: '100%' }}
+          >
+            👬 같이온 친구 등록하기
+          </button>
         </div>
 
         <div style={{ marginTop: '16px', fontSize: '13px', color: '#aaa' }}>

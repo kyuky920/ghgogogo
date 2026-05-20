@@ -42,11 +42,12 @@ export default function AdminPage() {
   }
 
   const handleExportCSV = () => {
-    const headers = ['이름', '소개자', '학교', '학년(세)', '친구동반', '보호자동반', '등록시각']
+    const headers = ['이름', '소개자', '학교', '방문 계기', '학년(세)', '친구동반', '보호자동반', '등록시각']
     const rows = registrations.map(r => [
       r.visitor_name,
       r.introducer_name || '',
       r.school || '',
+      r.visit_path || '',
       r.grade || '',
       r.with_friend ? '✓' : '',
       r.with_guardian ? '✓' : '',
@@ -65,7 +66,8 @@ export default function AdminPage() {
   const filtered = registrations.filter(r =>
     r.visitor_name.includes(search) ||
     (r.introducer_name || '').includes(search) ||
-    (r.school || '').includes(search)
+    (r.school || '').includes(search) ||
+    (r.visit_path || '').includes(search)
   )
 
   const totalFriend = registrations.filter(r => r.with_friend).length
@@ -170,7 +172,7 @@ export default function AdminPage() {
             <input
               className="input-field"
               type="text"
-              placeholder="이름, 소개자, 학교로 검색..."
+              placeholder="이름, 소개자, 학교, 방문 계기로 검색..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               style={{ maxWidth: '300px', margin: 0 }}
@@ -189,7 +191,7 @@ export default function AdminPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: '#F9F9F9' }}>
-                    {['#', '방문자', '소개자', '학교', '학년', '친구', '보호자', '등록시각', ''].map(h => (
+                    {['#', '방문자', '소개자', '학교', '방문 계기', '학년', '친구', '보호자', '등록시각', ''].map(h => (
                       <th key={h} style={{ padding: '12px 14px', textAlign: 'left', color: '#666', fontWeight: '700', whiteSpace: 'nowrap', borderBottom: '1px solid #F0F0F0' }}>{h}</th>
                     ))}
                   </tr>
@@ -201,6 +203,7 @@ export default function AdminPage() {
                       <td style={{ padding: '12px 14px', fontWeight: '700', color: '#333' }}>{r.visitor_name}</td>
                       <td style={{ padding: '12px 14px', color: '#666' }}>{r.introducer_name || '-'}</td>
                       <td style={{ padding: '12px 14px', color: '#666' }}>{r.school || '-'}</td>
+                      <td style={{ padding: '12px 14px', color: '#666', minWidth: '220px' }}>{r.visit_path || '-'}</td>
                       <td style={{ padding: '12px 14px', color: '#666' }}>{r.grade ? `${r.grade}학년` : '-'}</td>
                       <td style={{ padding: '12px 14px', textAlign: 'center' }}>
                         {r.with_friend ? <span style={{ color: '#4FC3F7', fontWeight: '700' }}>✓</span> : '-'}

@@ -8,6 +8,7 @@ interface Props {
     visitor_name?: string
     introducer_name?: string
     school?: string
+    visit_path?: string | null
     grade?: number | null
     with_friend?: boolean
     with_guardian?: boolean
@@ -17,9 +18,28 @@ interface Props {
 }
 
 export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminSave }: Props) {
+  const presetSchools = ['숲내초등학교', '향동초등학교']
+  const presetVisitPaths = [
+    '광흥교회에 다니고 있어요.',
+    '광흥교회의 친구를 따라 왔어요.',
+    '홍보 현수막을 보고 왔어요.',
+    '홍보 책자를 받고 왔어요.',
+  ]
+  const isPresetSchool = initialData?.school ? presetSchools.includes(initialData.school) : false
+  const isPresetVisitPath = initialData?.visit_path ? presetVisitPaths.includes(initialData.visit_path) : false
+
   const [visitorName, setVisitorName] = useState(initialData?.visitor_name || '')
   const [introducerName, setIntroducerName] = useState(initialData?.introducer_name || '')
-  const [school, setSchool] = useState(initialData?.school || '')
+  const [schoolOption, setSchoolOption] = useState(
+    initialData?.school ? (isPresetSchool ? initialData.school : 'other') : ''
+  )
+  const [customSchool, setCustomSchool] = useState(isPresetSchool ? '' : (initialData?.school || ''))
+  const [visitPathOption, setVisitPathOption] = useState(
+    initialData?.visit_path ? (isPresetVisitPath ? initialData.visit_path : 'other') : ''
+  )
+  const [customVisitPath, setCustomVisitPath] = useState(
+    isPresetVisitPath ? '' : (initialData?.visit_path || '')
+  )
   const [grade, setGrade] = useState<string>(initialData?.grade?.toString() || '')
   const [withFriend, setWithFriend] = useState(initialData?.with_friend || false)
   const [withGuardian, setWithGuardian] = useState(initialData?.with_guardian || false)
@@ -35,13 +55,32 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
       setError('참석 유형을 하나 이상 선택해주세요 🎈')
       return
     }
+    if (schoolOption === 'other' && !customSchool.trim()) {
+      setError('학교를 직접 선택했으면 학교 이름을 입력해주세요 🙏')
+      return
+    }
+    if (!visitPathOption.trim()) {
+      setError('방문 계기(경로)를 선택해주세요 🙏')
+      return
+    }
+    if (visitPathOption === 'other' && !customVisitPath.trim()) {
+      setError('기타 방문 계기를 입력해주세요 🙏')
+      return
+    }
+
+    const schoolValue =
+      schoolOption === 'other' ? customSchool.trim() : schoolOption.trim()
+    const visitPathValue =
+      visitPathOption === 'other' ? customVisitPath.trim() : visitPathOption.trim()
+
     setError('')
     setLoading(true)
     try {
       const { error: dbError } = await supabase.from('registrations').insert({
         visitor_name: visitorName.trim(),
         introducer_name: introducerName.trim() || null,
-        school: school.trim() || null,
+        school: schoolValue || null,
+        visit_path: visitPathValue,
         grade: grade ? parseInt(grade) : null,
         with_friend: withFriend,
         with_guardian: withGuardian,
@@ -155,13 +194,26 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
               <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
                 🏫 학교 <span style={{ color: '#aaa', fontWeight: '400' }}>(선택)</span>
               </label>
-              <input
+              <select
                 className="input-field"
-                type="text"
-                placeholder="학교명"
-                value={school}
-                onChange={e => setSchool(e.target.value)}
-              />
+                value={schoolOption}
+                onChange={e => setSchoolOption(e.target.value)}
+              >
+                <option value="">선택 안함</option>
+                <option value="숲내초등학교">숲내초등학교</option>
+                <option value="향동초등학교">향동초등학교</option>
+                <option value="other">기타 학교 (직접 입력)</option>
+              </select>
+              {schoolOption === 'other' && (
+                <input
+                  className="input-field"
+                  type="text"
+                  placeholder="학교명을 입력하세요"
+                  value={customSchool}
+                  onChange={e => setCustomSchool(e.target.value)}
+                  style={{ marginTop: '8px' }}
+                />
+              )}
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
@@ -177,6 +229,34 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
                 onChange={e => setGrade(e.target.value)}
               />
             </div>
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
+              🚪 방문 계기(경로) <span style={{ color: '#E91E8C' }}>*</span>
+            </label>
+            <select
+              className="input-field"
+              value={visitPathOption}
+              onChange={e => setVisitPathOption(e.target.value)}
+            >
+              <option value="">선택해주세요</option>
+              <option value="광흥교회에 다니고 있어요.">광흥교회에 다니고 있어요.</option>
+              <option value="광흥교회의 친구를 따라 왔어요.">광흥교회의 친구를 따라 왔어요.</option>
+              <option value="홍보 현수막을 보고 왔어요.">홍보 현수막을 보고 왔어요.</option>
+              <option value="홍보 책자를 받고 왔어요.">홍보 책자를 받고 왔어요.</option>
+              <option value="other">기타</option>
+            </select>
+            {visitPathOption === 'other' && (
+              <input
+                className="input-field"
+                type="text"
+                placeholder="방문 계기를 입력하세요"
+                value={customVisitPath}
+                onChange={e => setCustomVisitPath(e.target.value)}
+                style={{ marginTop: '8px' }}
+              />
+            )}
           </div>
 
           {/* 참석 유형 */}

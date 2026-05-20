@@ -13,6 +13,7 @@ export type Registration = {
   visitor_name: string
   introducer_name: string | null
   school: string | null
+  visit_path: string | null
   grade: number | null
   with_friend: boolean
   with_guardian: boolean

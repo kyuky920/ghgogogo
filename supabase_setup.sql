@@ -9,11 +9,15 @@ CREATE TABLE IF NOT EXISTS registrations (
   visitor_name    TEXT        NOT NULL,
   introducer_name TEXT,
   school          TEXT,
+  visit_path      TEXT,
   grade           INTEGER,
   with_friend     BOOLEAN     NOT NULL DEFAULT false,
   with_guardian   BOOLEAN     NOT NULL DEFAULT false,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE registrations
+  ADD COLUMN IF NOT EXISTS visit_path TEXT;
 
 -- 2. RLS (Row Level Security) 활성화
 ALTER TABLE registrations ENABLE ROW LEVEL SECURITY;
