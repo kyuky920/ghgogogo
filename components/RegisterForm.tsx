@@ -194,66 +194,68 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
             />
           </div>
 
-          {/* 학교 / 학년 */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
-                🏫 학교 <span style={{ color: '#aaa', fontWeight: '400' }}>(선택)</span>
-              </label>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label className={`choice-card ${schoolOption === '숲내초등학교' ? 'checked' : ''}`}>
-                  <input
-                    type="radio"
-                    name="school-option"
-                    checked={schoolOption === '숲내초등학교'}
-                    onChange={() => setSchoolOption('숲내초등학교')}
-                  />
-                  <span style={{ fontWeight: '600', fontSize: '15px' }}>숲내초등학교</span>
-                </label>
-                <label className={`choice-card ${schoolOption === '향동초등학교' ? 'checked' : ''}`}>
-                  <input
-                    type="radio"
-                    name="school-option"
-                    checked={schoolOption === '향동초등학교'}
-                    onChange={() => setSchoolOption('향동초등학교')}
-                  />
-                  <span style={{ fontWeight: '600', fontSize: '15px' }}>향동초등학교</span>
-                </label>
-                <label className={`choice-card ${schoolOption === 'other' ? 'checked' : ''}`}>
-                  <input
-                    type="radio"
-                    name="school-option"
-                    checked={schoolOption === 'other'}
-                    onChange={() => setSchoolOption('other')}
-                  />
-                  <span style={{ fontWeight: '600', fontSize: '15px' }}>기타 학교 직접 입력</span>
-                </label>
-              </div>
-              {schoolOption === 'other' && (
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
+              🏫 학교 <span style={{ color: '#aaa', fontWeight: '400' }}>(선택)</span>
+            </label>
+            <div className="compact-choice-grid">
+              <label className={`compact-choice-card ${schoolOption === '숲내초등학교' ? 'checked' : ''}`}>
                 <input
-                  className="input-field"
-                  type="text"
-                  placeholder="학교명을 입력하세요"
-                  value={customSchool}
-                  onChange={e => setCustomSchool(e.target.value)}
-                  style={{ marginTop: '8px' }}
+                  type="radio"
+                  name="school-option"
+                  checked={schoolOption === '숲내초등학교'}
+                  onChange={() => setSchoolOption('숲내초등학교')}
                 />
-              )}
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
-                📚 학년(세) <span style={{ color: '#aaa', fontWeight: '400' }}>(선택)</span>
+                <span style={{ fontWeight: '600', fontSize: '14px' }}>숲내초등학교</span>
               </label>
+              <label className={`compact-choice-card ${schoolOption === '향동초등학교' ? 'checked' : ''}`}>
+                <input
+                  type="radio"
+                  name="school-option"
+                  checked={schoolOption === '향동초등학교'}
+                  onChange={() => setSchoolOption('향동초등학교')}
+                />
+                <span style={{ fontWeight: '600', fontSize: '14px' }}>향동초등학교</span>
+              </label>
+              <label className={`compact-choice-card ${schoolOption === 'other' ? 'checked' : ''}`} style={{ gridColumn: '1 / -1' }}>
+                <input
+                  type="radio"
+                  name="school-option"
+                  checked={schoolOption === 'other'}
+                  onChange={() => setSchoolOption('other')}
+                />
+                <span style={{ fontWeight: '600', fontSize: '14px' }}>기타 학교 직접 입력</span>
+              </label>
+            </div>
+            {schoolOption === 'other' && (
               <input
                 className="input-field"
-                type="number"
-                placeholder="예: 3"
-                min="1"
-                max="20"
-                value={grade}
-                onChange={e => setGrade(e.target.value)}
+                type="text"
+                placeholder="학교명을 입력하세요"
+                value={customSchool}
+                onChange={e => setCustomSchool(e.target.value)}
+                style={{ marginTop: '8px' }}
               />
-            </div>
+            )}
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
+              📚 학년 <span style={{ color: '#aaa', fontWeight: '400' }}>(선택)</span>
+            </label>
+            <select
+              className="input-field"
+              value={grade}
+              onChange={e => setGrade(e.target.value)}
+            >
+              <option value="">선택 안함</option>
+              <option value="1">1학년</option>
+              <option value="2">2학년</option>
+              <option value="3">3학년</option>
+              <option value="4">4학년</option>
+              <option value="5">5학년</option>
+              <option value="6">6학년</option>
+            </select>
           </div>
 
           <div>

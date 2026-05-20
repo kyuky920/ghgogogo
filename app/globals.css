@@ -68,3 +68,36 @@ body {
 .choice-card.checked { border-color: var(--purple); background: #F5EEFF; }
 .choice-card input[type="checkbox"],
 .choice-card input[type="radio"] { width: 20px; height: 20px; accent-color: var(--purple); }
+
+.compact-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.compact-choice-card {
+  border: 2px solid #E8E8E8;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #FAFAFA;
+  min-height: 52px;
+  text-align: center;
+}
+
+.compact-choice-card.checked {
+  border-color: var(--pink);
+  background: #FFF2F8;
+}
+
+.compact-choice-card input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pink);
+  flex: 0 0 auto;
+}
