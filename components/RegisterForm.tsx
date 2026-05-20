@@ -174,7 +174,7 @@ export default function RegisterForm({ onSuccess, initialData, isAdmin, onAdminS
             <input
               className="input-field"
               type="text"
-              placeholder="우리 아이를 소개해준 분"
+              placeholder="소개해준 사람의 이름을 입력하세요"
               value={introducerName}
               onChange={e => setIntroducerName(e.target.value)}
             />
