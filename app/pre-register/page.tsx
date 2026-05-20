@@ -24,7 +24,7 @@ export default function PreRegisterPage() {
   if (alreadyDone) {
     return (
       <AlreadyRegistered
-        title="이미 사전등록되었어요! 😊"
+        title="사전등록이 완료되었어요! 😊"
         buttonLabel="👬 같이온 친구 사전등록하기"
         onRegisterCompanion={() => {
           localStorage.setItem(STORAGE_KEY, 'false')
