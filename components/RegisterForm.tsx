@@ -9,6 +9,7 @@ interface Props {
     visitor_name?: string
     introducer_name?: string | null
     school_level?: 'elementary' | 'middle' | 'infant'
+    school_stage?: 'middle' | 'high' | null
     school?: string | null
     visit_path?: string | null
     grade?: number | null
@@ -49,6 +50,7 @@ export default function RegisterForm({
   const [visitorName, setVisitorName] = useState(initialData?.visitor_name || '')
   const [introducerName, setIntroducerName] = useState(initialData?.introducer_name || '')
   const [schoolLevel, setSchoolLevel] = useState<'elementary' | 'middle' | 'infant'>(initialSchoolLevel)
+  const [schoolStage, setSchoolStage] = useState<'middle' | 'high' | ''>(initialData?.school_stage || '')
   const [schoolOption, setSchoolOption] = useState(
     initialSchoolLevel === 'elementary' && initialData?.school ? (isPresetSchool ? initialData.school : 'other') : ''
   )
@@ -89,12 +91,16 @@ export default function RegisterForm({
       setError(schoolLevel === 'infant' ? '유치원/어린이집 이름을 입력해주세요 🙏' : '학교 이름을 입력해주세요 🙏')
       return
     }
+    if (schoolLevel === 'middle' && !schoolStage) {
+      setError('중고등부는 중학교 또는 고등학교를 선택해주세요 🙏')
+      return
+    }
     if (schoolLevel === 'elementary' && grade && (parseInt(grade) < 1 || parseInt(grade) > 6)) {
       setError('초등부는 1학년부터 6학년까지 선택할 수 있어요 🙏')
       return
     }
     if (schoolLevel === 'middle' && grade && (parseInt(grade) < 1 || parseInt(grade) > 3)) {
-      setError('중고등부는 현재 1학년부터 3학년까지 선택할 수 있어요 🙏')
+      setError('중고등부는 중1~중3 또는 고1~고3까지만 선택할 수 있어요 🙏')
       return
     }
     if (schoolLevel === 'infant' && grade && (parseInt(grade) < 1 || parseInt(grade) > 7)) {
@@ -124,6 +130,7 @@ export default function RegisterForm({
         visitor_name: visitorName.trim(),
         introducer_name: introducerName.trim() || null,
         school_level: schoolLevel,
+        school_stage: schoolLevel === 'middle' ? schoolStage : null,
         school: schoolValue || null,
         visit_path: visitPathValue,
         grade: grade ? parseInt(grade) : null,
@@ -250,6 +257,7 @@ export default function RegisterForm({
                   checked={schoolLevel === 'infant'}
                   onChange={() => {
                     setSchoolLevel('infant')
+                    setSchoolStage('')
                     setSchoolOption('')
                   }}
                 />
@@ -262,6 +270,7 @@ export default function RegisterForm({
                   checked={schoolLevel === 'elementary'}
                   onChange={() => {
                     setSchoolLevel('elementary')
+                    setSchoolStage('')
                     if (!schoolOption) setSchoolOption('숲내초등학교')
                   }}
                 />
@@ -274,6 +283,7 @@ export default function RegisterForm({
                   checked={schoolLevel === 'middle'}
                   onChange={() => {
                     setSchoolLevel('middle')
+                    if (!schoolStage) setSchoolStage('middle')
                     setSchoolOption('')
                   }}
                 />
@@ -281,6 +291,34 @@ export default function RegisterForm({
               </label>
             </div>
           </div>
+
+          {schoolLevel === 'middle' && (
+            <div>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
+                🏷️ 학교급 <span style={{ color: '#E91E8C' }}>*</span>
+              </label>
+              <div className="compact-choice-grid">
+                <label className={`compact-choice-card ${schoolStage === 'middle' ? 'checked' : ''}`}>
+                  <input
+                    type="radio"
+                    name="school-stage"
+                    checked={schoolStage === 'middle'}
+                    onChange={() => setSchoolStage('middle')}
+                  />
+                  <span style={{ fontWeight: '600', fontSize: '14px' }}>중학교</span>
+                </label>
+                <label className={`compact-choice-card ${schoolStage === 'high' ? 'checked' : ''}`}>
+                  <input
+                    type="radio"
+                    name="school-stage"
+                    checked={schoolStage === 'high'}
+                    onChange={() => setSchoolStage('high')}
+                  />
+                  <span style={{ fontWeight: '600', fontSize: '14px' }}>고등학교</span>
+                </label>
+              </div>
+            </div>
+          )}
 
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '700', marginBottom: '6px', color: '#555' }}>
@@ -360,9 +398,9 @@ export default function RegisterForm({
                 onChange={e => setGrade(e.target.value)}
               >
                 <option value="">선택 안함</option>
-                <option value="1">1학년</option>
-                <option value="2">2학년</option>
-                <option value="3">3학년</option>
+                <option value="1">{schoolLevel === 'middle' && schoolStage === 'high' ? '고1' : schoolLevel === 'middle' ? '중1' : '1학년'}</option>
+                <option value="2">{schoolLevel === 'middle' && schoolStage === 'high' ? '고2' : schoolLevel === 'middle' ? '중2' : '2학년'}</option>
+                <option value="3">{schoolLevel === 'middle' && schoolStage === 'high' ? '고3' : schoolLevel === 'middle' ? '중3' : '3학년'}</option>
                 {schoolLevel === 'elementary' && <option value="4">4학년</option>}
                 {schoolLevel === 'elementary' && <option value="5">5학년</option>}
                 {schoolLevel === 'elementary' && <option value="6">6학년</option>}

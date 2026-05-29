@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS registrations (
   visitor_name    TEXT        NOT NULL,
   introducer_name TEXT,
   school_level    TEXT        NOT NULL DEFAULT 'elementary',
+  school_stage    TEXT,
   school          TEXT,
   visit_path      TEXT,
   grade           INTEGER,
@@ -26,6 +27,9 @@ ALTER TABLE registrations
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS school_level TEXT NOT NULL DEFAULT 'elementary';
+
+ALTER TABLE registrations
+  ADD COLUMN IF NOT EXISTS school_stage TEXT;
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS registration_kind TEXT NOT NULL DEFAULT 'onsite';

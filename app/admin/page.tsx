@@ -59,18 +59,34 @@ export default function AdminPage() {
     setEditingRegistration(null)
   }
 
+  const getStudentGroupLabel = (registration: Registration) => {
+    if (registration.school_level === 'infant') return '영유아부'
+    if (registration.school_level === 'middle') return '중고등부'
+    return '초등부'
+  }
+
+  const getGradeLabel = (registration: Registration) => {
+    if (!registration.grade) return ''
+    if (registration.school_level === 'infant') return `${registration.grade}세`
+    if (registration.school_level === 'middle') {
+      if (registration.school_stage === 'high') return `고${registration.grade}`
+      return `중${registration.grade}`
+    }
+    return `${registration.grade}학년`
+  }
+
   const handleExportCSV = () => {
     const headers = ['이름', '학생구분', '등록구분', '등록경로', '현장참석', '소개자', '소속', '방문 계기', '학년/나이', '친구동반', '보호자동반', '등록시각', '체크시각']
     const rows = registrations.map(r => [
       r.visitor_name,
-      r.school_level === 'infant' ? '영유아부' : r.school_level === 'middle' ? '중고등부' : '초등부',
+      getStudentGroupLabel(r),
       r.registration_kind === 'preregister' ? '사전등록' : '현장등록',
       r.registration_source === 'manual' ? '수동등록' : '온라인등록',
       r.checked_in ? '체크완료' : '',
       r.introducer_name || '',
       r.school || '',
       r.visit_path || '',
-      r.grade ? (r.school_level === 'infant' ? `${r.grade}세` : `${r.grade}학년`) : '',
+      getGradeLabel(r),
       r.with_friend ? '✓' : '',
       r.with_guardian ? '✓' : '',
       new Date(r.created_at).toLocaleString('ko-KR'),
@@ -244,7 +260,7 @@ export default function AdminPage() {
                       <td style={{ padding: '12px 14px', color: '#aaa', fontSize: '12px' }}>{filtered.length - i}</td>
                       <td style={{ padding: '12px 14px', fontWeight: '700', color: '#333' }}>{r.visitor_name}</td>
                       <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
-                        {r.school_level === 'infant' ? '영유아부' : r.school_level === 'middle' ? '중고등부' : '초등부'}
+                        {getStudentGroupLabel(r)}
                       </td>
                       <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
                         {r.registration_kind === 'preregister' ? '사전등록' : '현장등록'}
@@ -277,7 +293,7 @@ export default function AdminPage() {
                       <td style={{ padding: '12px 14px', color: '#666' }}>{r.school || '-'}</td>
                       <td style={{ padding: '12px 14px', color: '#666', minWidth: '220px' }}>{r.visit_path || '-'}</td>
                       <td style={{ padding: '12px 14px', color: '#666' }}>
-                        {r.grade ? (r.school_level === 'infant' ? `${r.grade}세` : `${r.grade}학년`) : '-'}
+                        {getGradeLabel(r) || '-'}
                       </td>
                       <td style={{ padding: '12px 14px', textAlign: 'center' }}>
                         {r.with_friend ? <span style={{ color: '#4FC3F7', fontWeight: '700' }}>✓</span> : '-'}
