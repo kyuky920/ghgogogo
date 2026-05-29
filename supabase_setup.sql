@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS registrations (
   school          TEXT,
   visit_path      TEXT,
   grade           INTEGER,
+  attending_alone BOOLEAN     NOT NULL DEFAULT false,
   with_friend     BOOLEAN     NOT NULL DEFAULT false,
   with_guardian   BOOLEAN     NOT NULL DEFAULT false,
   registration_kind TEXT      NOT NULL DEFAULT 'onsite',
@@ -30,6 +31,9 @@ ALTER TABLE registrations
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS school_stage TEXT;
+
+ALTER TABLE registrations
+  ADD COLUMN IF NOT EXISTS attending_alone BOOLEAN NOT NULL DEFAULT false;
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS registration_kind TEXT NOT NULL DEFAULT 'onsite';

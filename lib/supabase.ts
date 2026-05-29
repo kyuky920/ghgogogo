@@ -17,6 +17,7 @@ export type Registration = {
   school: string | null
   visit_path: string | null
   grade: number | null
+  attending_alone: boolean
   with_friend: boolean
   with_guardian: boolean
   registration_kind: 'onsite' | 'preregister'

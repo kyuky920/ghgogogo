@@ -13,6 +13,7 @@ interface Props {
     school?: string | null
     visit_path?: string | null
     grade?: number | null
+    attending_alone?: boolean
     with_friend?: boolean
     with_guardian?: boolean
     registration_kind?: 'onsite' | 'preregister'
@@ -69,6 +70,7 @@ export default function RegisterForm({
     isPresetVisitPath ? '' : (initialData?.visit_path || '')
   )
   const [grade, setGrade] = useState<string>(initialGradeValue)
+  const [attendingAlone, setAttendingAlone] = useState(initialData?.attending_alone || false)
   const [withFriend, setWithFriend] = useState(initialData?.with_friend || false)
   const [withGuardian, setWithGuardian] = useState(initialData?.with_guardian || false)
   const [loading, setLoading] = useState(false)
@@ -82,7 +84,7 @@ export default function RegisterForm({
       setError('방문자 이름을 입력해주세요 🙏')
       return
     }
-    if (!withFriend && !withGuardian) {
+    if (!attendingAlone && !withFriend && !withGuardian) {
       setError('참석 유형을 하나 이상 선택해주세요 🎈')
       return
     }
@@ -146,6 +148,7 @@ export default function RegisterForm({
         school: schoolValue || null,
         visit_path: visitPathValue,
         grade: parsedGrade,
+        attending_alone: attendingAlone,
         with_friend: withFriend,
         with_guardian: withGuardian,
         registration_kind: effectiveRegistrationKind,
@@ -474,11 +477,30 @@ export default function RegisterForm({
               🎈 참석 유형 <span style={{ color: '#E91E8C' }}>*</span>
             </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label className={`choice-card ${attendingAlone ? 'checked' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={attendingAlone}
+                  onChange={e => {
+                    const checked = e.target.checked
+                    setAttendingAlone(checked)
+                    if (checked) {
+                      setWithFriend(false)
+                      setWithGuardian(false)
+                    }
+                  }}
+                />
+                <span style={{ fontWeight: '600', fontSize: '15px' }}>🙋 혼자서 참석</span>
+              </label>
               <label className={`choice-card ${withFriend ? 'checked' : ''}`}>
                 <input
                   type="checkbox"
                   checked={withFriend}
-                  onChange={e => setWithFriend(e.target.checked)}
+                  onChange={e => {
+                    const checked = e.target.checked
+                    setWithFriend(checked)
+                    if (checked) setAttendingAlone(false)
+                  }}
                 />
                 <span style={{ fontWeight: '600', fontSize: '15px' }}>👫 친구와 함께 참석</span>
               </label>
@@ -486,7 +508,11 @@ export default function RegisterForm({
                 <input
                   type="checkbox"
                   checked={withGuardian}
-                  onChange={e => setWithGuardian(e.target.checked)}
+                  onChange={e => {
+                    const checked = e.target.checked
+                    setWithGuardian(checked)
+                    if (checked) setAttendingAlone(false)
+                  }}
                 />
                 <span style={{ fontWeight: '600', fontSize: '15px' }}>👨‍👩‍👧 보호자와 함께 참석</span>
               </label>
