@@ -60,16 +60,17 @@ export default function AdminPage() {
   }
 
   const handleExportCSV = () => {
-    const headers = ['이름', '등록구분', '등록경로', '현장참석', '소개자', '학교', '방문 계기', '학년(세)', '친구동반', '보호자동반', '등록시각', '체크시각']
+    const headers = ['이름', '학생구분', '등록구분', '등록경로', '현장참석', '소개자', '소속', '방문 계기', '학년/나이', '친구동반', '보호자동반', '등록시각', '체크시각']
     const rows = registrations.map(r => [
       r.visitor_name,
+      r.school_level === 'infant' ? '영유아부' : r.school_level === 'middle' ? '중학교' : '초등학교',
       r.registration_kind === 'preregister' ? '사전등록' : '현장등록',
       r.registration_source === 'manual' ? '수동등록' : '온라인등록',
       r.checked_in ? '체크완료' : '',
       r.introducer_name || '',
       r.school || '',
       r.visit_path || '',
-      r.grade || '',
+      r.grade ? (r.school_level === 'infant' ? `${r.grade}세` : `${r.grade}학년`) : '',
       r.with_friend ? '✓' : '',
       r.with_guardian ? '✓' : '',
       new Date(r.created_at).toLocaleString('ko-KR'),
@@ -232,7 +233,7 @@ export default function AdminPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                 <thead>
                   <tr style={{ background: '#F9F9F9' }}>
-                    {['#', '방문자', '등록구분', '등록경로', '현장참석', '소개자', '학교', '방문 계기', '학년', '친구', '보호자', '등록시각', ''].map(h => (
+                    {['#', '방문자', '학생구분', '등록구분', '등록경로', '현장참석', '소개자', '소속', '방문 계기', '학년/나이', '친구', '보호자', '등록시각', ''].map(h => (
                       <th key={h} style={{ padding: '12px 14px', textAlign: 'left', color: '#666', fontWeight: '700', whiteSpace: 'nowrap', borderBottom: '1px solid #F0F0F0' }}>{h}</th>
                     ))}
                   </tr>
@@ -242,6 +243,9 @@ export default function AdminPage() {
                     <tr key={r.id} style={{ borderBottom: '1px solid #F5F5F5' }}>
                       <td style={{ padding: '12px 14px', color: '#aaa', fontSize: '12px' }}>{filtered.length - i}</td>
                       <td style={{ padding: '12px 14px', fontWeight: '700', color: '#333' }}>{r.visitor_name}</td>
+                      <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
+                        {r.school_level === 'infant' ? '영유아부' : r.school_level === 'middle' ? '중학교' : '초등학교'}
+                      </td>
                       <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
                         {r.registration_kind === 'preregister' ? '사전등록' : '현장등록'}
                       </td>
@@ -272,7 +276,9 @@ export default function AdminPage() {
                       <td style={{ padding: '12px 14px', color: '#666' }}>{r.introducer_name || '-'}</td>
                       <td style={{ padding: '12px 14px', color: '#666' }}>{r.school || '-'}</td>
                       <td style={{ padding: '12px 14px', color: '#666', minWidth: '220px' }}>{r.visit_path || '-'}</td>
-                      <td style={{ padding: '12px 14px', color: '#666' }}>{r.grade ? `${r.grade}학년` : '-'}</td>
+                      <td style={{ padding: '12px 14px', color: '#666' }}>
+                        {r.grade ? (r.school_level === 'infant' ? `${r.grade}세` : `${r.grade}학년`) : '-'}
+                      </td>
                       <td style={{ padding: '12px 14px', textAlign: 'center' }}>
                         {r.with_friend ? <span style={{ color: '#4FC3F7', fontWeight: '700' }}>✓</span> : '-'}
                       </td>

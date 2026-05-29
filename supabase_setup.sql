@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS registrations (
   id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   visitor_name    TEXT        NOT NULL,
   introducer_name TEXT,
+  school_level    TEXT        NOT NULL DEFAULT 'elementary',
   school          TEXT,
   visit_path      TEXT,
   grade           INTEGER,
@@ -22,6 +23,9 @@ CREATE TABLE IF NOT EXISTS registrations (
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS visit_path TEXT;
+
+ALTER TABLE registrations
+  ADD COLUMN IF NOT EXISTS school_level TEXT NOT NULL DEFAULT 'elementary';
 
 ALTER TABLE registrations
   ADD COLUMN IF NOT EXISTS registration_kind TEXT NOT NULL DEFAULT 'onsite';

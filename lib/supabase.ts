@@ -12,6 +12,7 @@ export type Registration = {
   id: string
   visitor_name: string
   introducer_name: string | null
+  school_level: 'elementary' | 'middle' | 'infant'
   school: string | null
   visit_path: string | null
   grade: number | null
