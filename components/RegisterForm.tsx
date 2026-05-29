@@ -90,11 +90,11 @@ export default function RegisterForm({
       return
     }
     if (schoolLevel === 'elementary' && grade && (parseInt(grade) < 1 || parseInt(grade) > 6)) {
-      setError('초등학교는 1학년부터 6학년까지 선택할 수 있어요 🙏')
+      setError('초등부는 1학년부터 6학년까지 선택할 수 있어요 🙏')
       return
     }
     if (schoolLevel === 'middle' && grade && (parseInt(grade) < 1 || parseInt(grade) > 3)) {
-      setError('중학교는 1학년부터 3학년까지 선택할 수 있어요 🙏')
+      setError('중고등부는 현재 1학년부터 3학년까지 선택할 수 있어요 🙏')
       return
     }
     if (schoolLevel === 'infant' && grade && (parseInt(grade) < 1 || parseInt(grade) > 7)) {
@@ -243,18 +243,6 @@ export default function RegisterForm({
               🏫 구분 <span style={{ color: '#E91E8C' }}>*</span>
             </label>
             <div className="compact-choice-grid">
-              <label className={`compact-choice-card ${schoolLevel === 'elementary' ? 'checked' : ''}`}>
-                <input
-                  type="radio"
-                  name="school-level"
-                  checked={schoolLevel === 'elementary'}
-                  onChange={() => {
-                    setSchoolLevel('elementary')
-                    if (!schoolOption) setSchoolOption('숲내초등학교')
-                  }}
-                />
-                <span style={{ fontWeight: '600', fontSize: '14px' }}>초등학교</span>
-              </label>
               <label className={`compact-choice-card ${schoolLevel === 'infant' ? 'checked' : ''}`}>
                 <input
                   type="radio"
@@ -267,6 +255,18 @@ export default function RegisterForm({
                 />
                 <span style={{ fontWeight: '600', fontSize: '14px' }}>영유아부</span>
               </label>
+              <label className={`compact-choice-card ${schoolLevel === 'elementary' ? 'checked' : ''}`}>
+                <input
+                  type="radio"
+                  name="school-level"
+                  checked={schoolLevel === 'elementary'}
+                  onChange={() => {
+                    setSchoolLevel('elementary')
+                    if (!schoolOption) setSchoolOption('숲내초등학교')
+                  }}
+                />
+                <span style={{ fontWeight: '600', fontSize: '14px' }}>초등부</span>
+              </label>
               <label className={`compact-choice-card ${schoolLevel === 'middle' ? 'checked' : ''}`} style={{ gridColumn: '1 / -1' }}>
                 <input
                   type="radio"
@@ -277,7 +277,7 @@ export default function RegisterForm({
                     setSchoolOption('')
                   }}
                 />
-                <span style={{ fontWeight: '600', fontSize: '14px' }}>중학교</span>
+                <span style={{ fontWeight: '600', fontSize: '14px' }}>중고등부</span>
               </label>
             </div>
           </div>
@@ -314,14 +314,14 @@ export default function RegisterForm({
                       checked={schoolOption === 'other'}
                       onChange={() => setSchoolOption('other')}
                     />
-                    <span style={{ fontWeight: '600', fontSize: '14px' }}>기타 초등학교 직접 입력</span>
+                    <span style={{ fontWeight: '600', fontSize: '14px' }}>기타 초등부 학교 직접 입력</span>
                   </label>
                 </div>
                 {schoolOption === 'other' && (
                   <input
                     className="input-field"
                     type="text"
-                    placeholder="초등학교 이름을 입력하세요"
+                    placeholder="초등부 학교 이름을 입력하세요"
                     value={customSchool}
                     onChange={e => setCustomSchool(e.target.value)}
                     style={{ marginTop: '8px' }}
@@ -332,7 +332,7 @@ export default function RegisterForm({
               <input
                 className="input-field"
                 type="text"
-                placeholder={schoolLevel === 'infant' ? '유치원/어린이집 이름을 입력하세요' : '중학교 이름을 입력하세요'}
+                placeholder={schoolLevel === 'infant' ? '유치원/어린이집 이름을 입력하세요' : '중고등부 학교 이름을 입력하세요'}
                 value={customSchool}
                 onChange={e => setCustomSchool(e.target.value)}
               />

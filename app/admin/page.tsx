@@ -63,7 +63,7 @@ export default function AdminPage() {
     const headers = ['이름', '학생구분', '등록구분', '등록경로', '현장참석', '소개자', '소속', '방문 계기', '학년/나이', '친구동반', '보호자동반', '등록시각', '체크시각']
     const rows = registrations.map(r => [
       r.visitor_name,
-      r.school_level === 'infant' ? '영유아부' : r.school_level === 'middle' ? '중학교' : '초등학교',
+      r.school_level === 'infant' ? '영유아부' : r.school_level === 'middle' ? '중고등부' : '초등부',
       r.registration_kind === 'preregister' ? '사전등록' : '현장등록',
       r.registration_source === 'manual' ? '수동등록' : '온라인등록',
       r.checked_in ? '체크완료' : '',
@@ -244,7 +244,7 @@ export default function AdminPage() {
                       <td style={{ padding: '12px 14px', color: '#aaa', fontSize: '12px' }}>{filtered.length - i}</td>
                       <td style={{ padding: '12px 14px', fontWeight: '700', color: '#333' }}>{r.visitor_name}</td>
                       <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
-                        {r.school_level === 'infant' ? '영유아부' : r.school_level === 'middle' ? '중학교' : '초등학교'}
+                        {r.school_level === 'infant' ? '영유아부' : r.school_level === 'middle' ? '중고등부' : '초등부'}
                       </td>
                       <td style={{ padding: '12px 14px', color: '#666', whiteSpace: 'nowrap' }}>
                         {r.registration_kind === 'preregister' ? '사전등록' : '현장등록'}
