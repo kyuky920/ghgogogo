@@ -352,14 +352,14 @@ export default function RegisterForm({
                       checked={schoolOption === 'other'}
                       onChange={() => setSchoolOption('other')}
                     />
-                    <span style={{ fontWeight: '600', fontSize: '14px' }}>기타 초등부 학교 직접 입력</span>
+                    <span style={{ fontWeight: '600', fontSize: '14px' }}>학교 이름 직접 입력</span>
                   </label>
                 </div>
                 {schoolOption === 'other' && (
                   <input
                     className="input-field"
                     type="text"
-                    placeholder="초등부 학교 이름을 입력하세요"
+                    placeholder="학교 이름을 직접 입력하세요"
                     value={customSchool}
                     onChange={e => setCustomSchool(e.target.value)}
                     style={{ marginTop: '8px' }}
