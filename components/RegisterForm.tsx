@@ -2,6 +2,13 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
+type ErrorWithDetails = {
+  code?: string
+  message?: string
+  details?: string
+  hint?: string
+}
+
 interface Props {
   onSuccess: () => void
   initialData?: {
@@ -163,8 +170,33 @@ export default function RegisterForm({
       } else {
         onSuccess()
       }
-    } catch {
-      setError('등록 중 오류가 발생했어요. 다시 시도해주세요.')
+    } catch (error) {
+      const err = error as ErrorWithDetails
+      console.error('Registration save failed', {
+        code: err?.code,
+        message: err?.message,
+        details: err?.details,
+        hint: err?.hint,
+        payload: {
+          visitor_name: visitorName.trim(),
+          school_level: schoolLevel,
+          school: schoolValue || null,
+          visit_path: visitPathValue,
+          grade: parsedGrade,
+          attending_alone: attendingAlone,
+          with_friend: withFriend,
+          with_guardian: withGuardian,
+          registration_kind: effectiveRegistrationKind,
+          registration_source: effectiveRegistrationSource,
+          is_editing: isEditing,
+          registration_id: initialData?.id || null,
+        },
+      })
+      setError(
+        err?.code
+          ? `등록 중 오류가 발생했어요. 코드: ${err.code}`
+          : '등록 중 오류가 발생했어요. 다시 시도해주세요.'
+      )
     } finally {
       setLoading(false)
     }
